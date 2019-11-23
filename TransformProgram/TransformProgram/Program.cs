@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace TransformProgram
@@ -70,8 +71,41 @@ namespace TransformProgram
 
         public static string CamelCase(string input)
         {
-            var ret = string.Join("", input.Split(' ').Select(w => FirstLetterToUpper(w)));
-            return FirstLetterToLower(ret);
+            string newWord = "";
+
+            if (input.Contains(" "))
+            {
+                if (char.IsUpper(input[0]))
+                    newWord += char.ToLower(input[0]);
+                else
+                    newWord += input[0];
+
+                for (int i = 1; i < input.Length; i++)
+                {
+                    if (char.IsLower(input[i]) && input[i - 1] == ' ')
+                        newWord += char.ToUpper(input[i]);
+                    else
+                        newWord += input[i];
+                }
+
+                newWord = Regex.Replace(newWord, @"\s", "");
+
+                return newWord;
+
+            }
+            else
+            {
+                if (char.IsUpper(input[0]))
+                {
+                    newWord += char.ToLower(input[0]);
+                    for (int i = 1; i < input.Length; i++)
+                        newWord += input[i];
+
+                    return newWord;
+                }
+                else
+                    return input;
+            }
         }
 
         public static string LowerCase(string input)
@@ -97,7 +131,32 @@ namespace TransformProgram
 
         public static string Pack(string input)
         {
-            return null;
+
+            return input.Replace(" ", "");
+
+            //var ret = input;
+
+            //var LSpace = "";
+            //for (int i = 0; i < input.Length; i++)
+            //{
+            //    if (i + 1 == input.Length)
+            //    {
+            //        break;;
+            //    }
+
+            //    if (input[i].Equals(' ') && !input[i + 1].Equals(' '))
+            //    {
+            //        //LSpace = input.Substring(i);
+            //        break;;
+            //    }
+
+
+            //}
+
+
+            //Console.WriteLine();
+
+            //return null;
         }
 
         public static string LTrim(string input)
@@ -116,7 +175,7 @@ namespace TransformProgram
         }
         public static string Transform(string input, string pattern)
         {
-            List<string> operationList = input.Split('-', '>').Where(y => y != string.Empty).ToList();
+            List<string> operationList = pattern.Split('-', '>').Where(y => y != string.Empty).ToList();
 
             string ret = input;
 
@@ -159,6 +218,10 @@ namespace TransformProgram
                     ret = Trim(ret);
                 }
 
+                if (item.Equals("snake"))
+                {
+                    ret = SnakeCase(ret);
+                }
             }
 
             return ret;
@@ -166,19 +229,85 @@ namespace TransformProgram
 
         static void Main(string[] args)
         {
-            while (true)
-            {
-                Console.Clear();
-                Console.WriteLine("Introducir Texto:");
-                string input = Console.ReadLine();
+          
 
-                string output = SnakeCase(input);
+            Console.Clear();
+            Console.WriteLine("Prueba: 01");
+            string input = "     hOLA profesor";
+            Console.WriteLine($"INPUT: {input} ");
+            string output = Transform(input, "upper->pack->Ltrim");
+            Console.WriteLine($"OUTPUT: {output} ");
+            Console.WriteLine();
 
-                Console.WriteLine(output);
 
-                Console.ReadKey();
-            }
+            Console.WriteLine("Prueba: 02");
+            input = "buenas AMIGOS   ";
+            Console.WriteLine($"INPUT: {input} ");
+            output = Transform(input, "lower->camel->Ltrim");
+            Console.WriteLine($"OUTPUT: {output} ");
+            Console.WriteLine();
 
+            Console.WriteLine("Prueba: 03");
+            input = "    laComputadora Azul   ";
+            Console.WriteLine($"INPUT: {input} ");
+            output = Transform(input, "trim->lower->pack");
+            Console.WriteLine($"OUTPUT: {output} ");
+            Console.WriteLine();
+
+            Console.WriteLine("Prueba: 04");
+            input = "está tareaESTA_Larga";
+            Console.WriteLine($"INPUT: {input} ");
+            output = Transform(input, "upper->camel->pack->lower");
+            Console.WriteLine($"OUTPUT: {output} ");
+            Console.WriteLine();
+
+            Console.WriteLine("Prueba: 05");
+            input = "AYUDE al estudiante      ";
+            Console.WriteLine($"INPUT: {input} ");
+            output = Transform(input, "upper->snake->Rtrim");
+            Console.WriteLine($"OUTPUT: {output} ");
+            Console.WriteLine();
+
+            Console.WriteLine("Prueba: 06");
+            input = "vamos A tRABAJAR";
+            Console.WriteLine($"INPUT: {input} ");
+            output = Transform(input, "pascal->snake->pack");
+            Console.WriteLine($"OUTPUT: {output} ");
+            Console.WriteLine();
+            Console.ReadKey();
+            //var x = "            a a a";
+            //var y = "";
+
+
+
+            //////////////
+            //Console.WriteLine();
+            //x = "A A A b";
+            //y = Transform(x, "upper->pack->pascal");
+            //Console.WriteLine(y);
+            //Console.WriteLine("Caso 1B: " + (y == "Aaab"));
+            //x = "    Hola   Mundo";
+            //y = Transform(x, "pack->pascal");
+            //Console.WriteLine(y);
+            //Console.WriteLine("Caso 2A: " + (y == "Holamundo"));
+            //x = "SALuDO";
+            //y = Transform(x, "upper->pascal");
+            //Console.WriteLine(y);
+            //Console.WriteLine("Caso 2B: " + (y == "Saludo"));
+            //x = "Esto Es Una Oracion";
+            //y = Transform(x, "camel->pack->lower");
+            //Console.WriteLine(y);
+            //Console.WriteLine("Caso 3A: " + (y == "estoesunaoracion"));
+            //x = "esto  es  una  oracion";
+            //y = Transform(x, "camel->lower");
+            //Console.WriteLine(y);
+            //Console.WriteLine("Caso 3A: " + (y == x));
+
+            //x = "esto es una oracion";
+            //y = Transform(x, "camel");
+            //Console.WriteLine(y);
+            //Console.WriteLine("Caso 3A: " + (y == "Esto Es Una Oracion"));
+            //Console.ReadKey();
         }
     }
 }
